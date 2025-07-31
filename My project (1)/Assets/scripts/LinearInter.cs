@@ -21,7 +21,7 @@ public class LinearInter : MonoBehaviour
 
     private void Update()
     {
-        if (t < 1.0f) ;
+        if (t < 1.0f)
 
         {
             t += Time.deltaTime * speed;
