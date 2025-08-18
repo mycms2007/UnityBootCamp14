@@ -1,83 +1,83 @@
-# 유니티 회전 및 이동, 레이캐스트, 수학 함수 실습 정리
+# 유니티 입력 이벤트와 델리게이트 기초 정리
 
 ### 학습 날짜
-2025.08.01 (유니티 부트캠프 14기 기준)
+
+2025.08.14 
+
 ### 학습 개요
-오늘의 실습은 유니티에서 회전(Transform/Quaternion), 이동(Input + Rigidbody), 레이캐스트(Raycast), 수학 함수(Mathf)를 활용하여 오브젝트를 제어하는 방법을 중심으로 구성되었습니다.
-직접 구현을 통해 다양한 API와 물리 개념을 체화하고, 움직임/회전의 실제 효과를 체감했습니다.
 
-## 주요 학습 항목 및 실습 내용
-### 1. 회전의 종류 및 구현 방식
-🔸 ObjectRotate.cs
-transform.Rotate()를 사용하여 월드 기준 회전을 구현
+유니티 이벤트 시스템 구조와 동작 원리를 학습함
 
-오일러 각 기반으로 (20, 20, 20)만큼 프레임마다 회전
+C#의 델리게이트 개념(Action, Func, event)과 UnityEvent의 차이를 이해함
 
-🔸 AroundRotate.cs
-transform.RotateAround()를 사용하여 지정된 피벗을 중심으로 회전
+다양한 입력 이벤트 인터페이스를 직접 구현해봄으로써 이벤트 흐름과 호출 방식 체험
 
-중심축 기준 회전 구현
+각 이벤트의 실행 타이밍과 조건을 실습을 통해 체감함
 
-🔸 QuaternionSample.cs
-쿼터니언 개념 정리 및 코드 구조 작성
+### 주요 학습 항목 및 스크립트 정리
 
-Quaternion.Euler, LookRotation, RotateTowards, Slerp, Lerp 등 다양한 회전 방식 학습
+#### 📂 ActionFuncExample.cs
 
-실습보다는 개념 정리 위주
+C#에서의 Action<T>와 Func<T>의 사용 예제
 
-🔸 TargetRotate.cs
-Quaternion.LookRotation()과 RotateTowards()를 조합해 타겟 방향 회전 구현
+메서드를 변수처럼 다루며 동적으로 기능을 설정하는 방식 체험
 
-방향 벡터 계산 → 점진적 회전 처리
+Action<int>로 전달만, Func<string,int>로 반환 있는 처리
 
-### 2. 레이캐스트를 통한 오브젝트 상호작용
-🔸 CameraRayCastSample.cs
-Camera.main.ScreenPointToRay()를 사용하여 마우스 클릭 위치로 레이 쏘기
+func01()에 AttackAble 메서드를 연결해 조건 판단 후 결과 출력
 
-Ray가 충돌한 오브젝트의 색상 변경 및 레이어 변경 처리
+람다식으로도 Func<bool> 구현 가능함을 직접 실습함
 
-LayerMask.NameToLayer()로 레이어 변경 처리 실습
+#### 📂 eventExample.cs
 
-### 3. 물리 기반 이동과 점프 구현
-🔸 PlayerMovement.cs
-Rigidbody를 활용한 물리 이동
+Action과 event Action의 차이점 비교 실습
 
-Input.GetAxis("Horizontal"), Input.GetAxis("Vertical") → 방향 이동
+onStart, onDeath에 여러 메서드를 구독하고 Invoke()로 호출
 
-AddForce()와 isGrounded 체크로 점프 구현
+event는 외부에서 직접 호출이 불가하다는 점을 코드로 검증
 
-Physics.Raycast()로 바닥 여부 탐지 (LayerMask 사용)
+Ready, Fight, Damaged, Dead 메서드를 순차적으로 실행시키며 이벤트 흐름 구조 확인
 
-### 4. Mathf 관련 수학 상수 및 연산 실습
-🔸 MathfSample.cs
-Mathf.Clamp(), Mathf.Abs(), Mathf.Sin(), Mathf.Pow() 등 자주 쓰이는 수학 함수 사용 예제
+#### 📂 ClickTester.cs
 
-UI나 상태 수치 조작 시 사용될 수 있는 실용적 함수 구조 복습
+IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler 등
+마우스 입력 이벤트 관련 인터페이스 구현 실습
 
-🔸 MathfConstant.cs
-Mathf.PI, Mathf.Infinity, Mathf.Deg2Rad, Mathf.Epsilon 등 수학 상수 목록 정리
+PointerEventData의 다양한 정보(좌표, 클릭 횟수, 드래그 여부 등)를 Debug로 출력하여 구조 확인
 
-실전 활용은 미흡하지만 향후 참조용으로 의미 있음
+UI 입력 흐름이 어떤 방식으로 이벤트를 소비하는지 감각적으로 이해
 
-### 느낀점 / 메모
-회전 처리는 Euler와 Quaternion의 차이를 명확히 이해해야 혼란이 줄어듦
+#### 📂 UIEventCycle.cs
 
-Raycast와 LookRotation은 게임 속 상호작용과 시선 방향 제어의 핵심이 되는 기능
+UnityEngine.EventSystems의 거의 모든 UI 관련 입력 인터페이스를 한번에 구현해본 예제
 
-AddForce로 점프할 때 Ground 체크가 없으면 공중 점프가 발생하므로 방지 필수
+Handle() 메서드로 이벤트 이름, 위치, 시간 간격 등을 시각화 출력함
 
-한 줄 한 줄 입력하며 작동 확인하는 것이 가장 좋은 체득법이라는 점을 다시 느꼈음
+BaseEventData를 PointerEventData로 패턴 매칭하여 마우스 위치 출력 가능
 
-참고자료
-부트캠프 제공 예제 코드
+이벤트 발생 시 시간 간격과 순서를 통해 흐름 파악하는 구조 설계
 
-강사님 코드 작성 시 시연된 흐름
+아직 대부분의 인터페이스는 throw new NotImplementedException() 상태이므로 후속 구현 예정
 
-Unity 공식 문서 및 API 레퍼런스
+### 오늘 느낀 점
 
-다음 목표
-Input + 회전을 응용한 미니 3D 조작 게임 구현
+인터페이스 기반 이벤트 시스템은 처음엔 이름 외우기부터 부담이지만, 반복해서 구현해보니 자연스럽게 익숙해졌다.
 
-Raycast와 Layer를 활용한 적중 판정/타겟팅 시스템 시도
+Action, Func 개념은 단순하지만 응용이 엄청 넓다는 걸 체감했고, 특히 Func<T>의 반환 구조와 람다식 연결이 매우 유연하다는 점이 인상 깊었다.
 
-Quaternion을 이용한 카메라 시점 전환 실험
+UnityEvent vs event Action의 차이를 코드로 비교해본 게 가장 도움이 되었고, 그 차이를 직접 눈으로 확인하니 개념이 완전히 정리됨.
+
+실습 중 에러도 있었지만 덕분에 delegate가 어떤 상황에서 막히는지도 파악하게 됨.
+
+### 다음 목표
+
+UIEventCycle.cs에 미구현 상태로 남겨둔 이벤트들을 실제 처리 내용으로 구현 예정
+
+Action과 Func을 직접 활용하여 UI 버튼에 동적으로 기능 부여 실험 예정
+
+인터페이스를 단일 클래스로 몰아넣기보다 역할별로 분리해서 관리하는 구조로 점진적 리팩토링 계획
+
+델리게이트와 UnityEvent를 활용해 UI → 게임로직 → 상태 전이 흐름을 명확히 연결해보는 미니 프로젝트 구상 예정
+
+
+
