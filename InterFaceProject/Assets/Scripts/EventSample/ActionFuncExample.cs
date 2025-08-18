@@ -10,6 +10,20 @@ public class ActionFuncExample : MonoBehaviour
     public Action<int> myaction;
     public Action<int,string> myaction2;
 
+    //Func는 마지막에 적히는 부분이 Func가 사용할 함수의 반환 타입입니다.
+
+    public Func<bool> func01;
+    public Func<string, int> func02;
+
+    int result(string s) => int.Parse(s);
+
+
+    bool AttackAble()
+    {
+        int rand = UnityEngine. Random.Range(0, 10);
+        return rand <=3? true : false;
+
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +35,18 @@ public class ActionFuncExample : MonoBehaviour
 
         myaction(50);
         myaction2(40, "Steve");
+
+        func01 = AttackAble;
+
+        if (func01())
+            Debug.Log("공격 성공");
+        else
+            Debug.Log("공격 실패..");
+
+        func02 = result;
+        int point = func02("14");
+
+        func01 = () => point > 10? true: false;
 
     }
 
