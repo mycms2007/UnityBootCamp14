@@ -1,83 +1,86 @@
-# 유니티 회전 및 이동, 레이캐스트, 수학 함수 실습 정리
-
+# 유니티 2D 슈팅 기본 구현 실습 정리
 ### 학습 날짜
-2025.08.01 (유니티 부트캠프 14기 기준)
+2025.08.18
+
 ### 학습 개요
-오늘의 실습은 유니티에서 회전(Transform/Quaternion), 이동(Input + Rigidbody), 레이캐스트(Raycast), 수학 함수(Mathf)를 활용하여 오브젝트를 제어하는 방법을 중심으로 구성되었습니다.
-직접 구현을 통해 다양한 API와 물리 개념을 체화하고, 움직임/회전의 실제 효과를 체감했습니다.
 
-## 주요 학습 항목 및 실습 내용
-### 1. 회전의 종류 및 구현 방식
-🔸 ObjectRotate.cs
-transform.Rotate()를 사용하여 월드 기준 회전을 구현
+오늘은 유니티에서 2D 슈팅 게임의 기본 구조를 설계했습니다.
+배경 스크롤, 플레이어 이동 및 발사, 총알 이동, 적 생성 및 충돌 처리까지 흐름을 하나의 프로젝트로 구현하며, 오브젝트 간 상호작용과 충돌 이벤트의 기본을 익혔습니다.
 
-오일러 각 기반으로 (20, 20, 20)만큼 프레임마다 회전
+### 주요 학습 항목 및 실습 내용
+#### 1. 배경 스크롤
 
-🔸 AroundRotate.cs
-transform.RotateAround()를 사용하여 지정된 피벗을 중심으로 회전
+🔸 Background.cs
 
-중심축 기준 회전 구현
+material.mainTextureOffset을 이용해 배경 텍스처를 지속적으로 위로 이동
 
-🔸 QuaternionSample.cs
-쿼터니언 개념 정리 및 코드 구조 작성
+scrollSpeed 값으로 스크롤 속도 조정
 
-Quaternion.Euler, LookRotation, RotateTowards, Slerp, Lerp 등 다양한 회전 방식 학습
+#### 2. 총알 이동
 
-실습보다는 개념 정리 위주
+🔸 Bullet.cs
 
-🔸 TargetRotate.cs
-Quaternion.LookRotation()과 RotateTowards()를 조합해 타겟 방향 회전 구현
+위 방향(Vector3.up)으로 지속적인 이동 구현
 
-방향 벡터 계산 → 점진적 회전 처리
+transform.position += dir * speed * Time.deltaTime 방식 적용
 
-### 2. 레이캐스트를 통한 오브젝트 상호작용
-🔸 CameraRayCastSample.cs
-Camera.main.ScreenPointToRay()를 사용하여 마우스 클릭 위치로 레이 쏘기
+speed를 공개 변수로 두어 Inspector에서 조절 가능
 
-Ray가 충돌한 오브젝트의 색상 변경 및 레이어 변경 처리
+#### 3. 플레이어 이동 및 발사
 
-LayerMask.NameToLayer()로 레이어 변경 처리 실습
+🔸 PlayerMove.cs
 
-### 3. 물리 기반 이동과 점프 구현
-🔸 PlayerMovement.cs
-Rigidbody를 활용한 물리 이동
+Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")로 방향 입력 감지
 
-Input.GetAxis("Horizontal"), Input.GetAxis("Vertical") → 방향 이동
+입력값을 Vector3로 변환 후 위치 갱신
 
-AddForce()와 isGrounded 체크로 점프 구현
+🔸 PlayerFire.cs
 
-Physics.Raycast()로 바닥 여부 탐지 (LayerMask 사용)
+Input.GetButtonDown("Fire1") (기본적으로 마우스 좌클릭/스페이스) 시 총알 발사
 
-### 4. Mathf 관련 수학 상수 및 연산 실습
-🔸 MathfSample.cs
-Mathf.Clamp(), Mathf.Abs(), Mathf.Sin(), Mathf.Pow() 등 자주 쓰이는 수학 함수 사용 예제
+Instantiate()로 bulletFactory에서 총알 생성, firePosition 위치에서 발사
 
-UI나 상태 수치 조작 시 사용될 수 있는 실용적 함수 구조 복습
+#### 4. 적 오브젝트 동작
 
-🔸 MathfConstant.cs
-Mathf.PI, Mathf.Infinity, Mathf.Deg2Rad, Mathf.Epsilon 등 수학 상수 목록 정리
+🔸 Enemy.cs
 
-실전 활용은 미흡하지만 향후 참조용으로 의미 있음
+EnemyType(Down, Chase) 열거형 설계
 
-### 느낀점 / 메모
-회전 처리는 Euler와 Quaternion의 차이를 명확히 이해해야 혼란이 줄어듦
+Down: 단순히 아래로 이동
 
-Raycast와 LookRotation은 게임 속 상호작용과 시선 방향 제어의 핵심이 되는 기능
+Chase: 플레이어 방향으로 추적 이동
 
-AddForce로 점프할 때 Ground 체크가 없으면 공중 점프가 발생하므로 방지 필수
+시작 시 PatternSetting()으로 무작위 패턴 설정
 
-한 줄 한 줄 입력하며 작동 확인하는 것이 가장 좋은 체득법이라는 점을 다시 느꼈음
+OnCollisionEnter() 시:
 
-참고자료
-부트캠프 제공 예제 코드
+ScoreManager.instance.SetScore(5) 호출로 점수 증가
 
-강사님 코드 작성 시 시연된 흐름
+폭발 이펙트(explosionFactory) 생성
 
-Unity 공식 문서 및 API 레퍼런스
+충돌 상대와 자신을 Destroy()
 
-다음 목표
-Input + 회전을 응용한 미니 3D 조작 게임 구현
+#### 느낀 점 / 메모
 
-Raycast와 Layer를 활용한 적중 판정/타겟팅 시스템 시도
+Input.GetAxis 기반 이동은 키보드 입력을 자연스럽게 연속값으로 처리해 부드러운 움직임 구현 가능.
 
-Quaternion을 이용한 카메라 시점 전환 실험
+Instantiate()와 Destroy()의 흐름을 통해 발사체와 적 오브젝트의 생명주기를 명확히 이해.
+
+OnCollisionEnter와 IsTrigger 차이를 다시 복습할 수 있었음.
+
+Enemy 패턴이 단순하지만, 랜덤 요소와 추적 로직만으로도 게임성이 확 달라지는 것을 확인.
+
+#### 참고자료
+
+부트캠프 강의 실습 코드
+
+
+강사님 시연 코드 및 프로젝트 구조
+
+#### 다음 목표
+
+Enemy 스폰 시스템 고도화 (Wave 단위, 시간 간격 생성)
+
+Player와 Enemy HP 관리, 체력 UI 연동
+
+Bullet 충돌에 따른 점수/이펙트 다양화
